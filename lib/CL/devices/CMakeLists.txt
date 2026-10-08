@@ -75,6 +75,15 @@ if(BUILD_TBB)
   endif()
 endif()
 
+if(BUILD_SPERT)
+  add_subdirectory("spert")
+  set(POCL_DEVICES_OBJS "${POCL_DEVICES_OBJS}"
+    "$<TARGET_OBJECTS:pocl-devices-spert>")
+  if(NOT ENABLE_LOADABLE_DRIVERS)
+    list(APPEND POCL_DEVICES_LINK_LIST ${SPERT_LIBRARY})
+  endif()
+endif()
+
 if(BUILD_REMOTE_CLIENT)
   add_subdirectory("remote")
   set(POCL_DEVICES_OBJS "${POCL_DEVICES_OBJS}"

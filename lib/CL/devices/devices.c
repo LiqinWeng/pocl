@@ -73,6 +73,9 @@
 #ifdef BUILD_TBB
 #include "tbb/tbb.h"
 #endif
+#ifdef BUILD_SPERT
+#include "spert/spert.h"
+#endif
 
 #ifdef TCE_AVAILABLE
 #include "tce/ttasim/ttasim.h"
@@ -167,6 +170,9 @@ static init_device_ops pocl_devices_init_ops[] = {
 #ifdef BUILD_TBB
   INIT_DEV (tbb),
 #endif
+#ifdef BUILD_SPERT
+  INIT_DEV (spert),
+#endif
 #ifdef BUILD_HSA
   INIT_DEV (hsa),
 #endif
@@ -201,6 +207,9 @@ char pocl_device_types[POCL_NUM_DEVICE_TYPES][33] = {
 #endif
 #ifdef BUILD_TBB
   "tbb",
+#endif
+#ifdef BUILD_SPERT
+  "spert",
 #endif
 #ifdef TCE_AVAILABLE
   "ttasim",

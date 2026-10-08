@@ -7,6 +7,7 @@
 #cmakedefine BUILD_CUDA
 #cmakedefine BUILD_BASIC
 #cmakedefine BUILD_TBB
+#cmakedefine BUILD_SPERT
 #cmakedefine BUILD_PTHREAD
 #cmakedefine BUILD_ALMAIF
 #cmakedefine BUILD_VULKAN

@@ -298,6 +298,8 @@ option(ENABLE_NPU "Experimental support for Intel NPU (requires LevelZero driver
 
 option(ENABLE_TBB_DEVICE "Enable the Intel TBB device driver." OFF)
 
+option(ENABLE_SPERT_DEVICE "Enable the SpaceMit device driver." OFF)
+
 option(ENABLE_HOST_CPU_DEVICES "Add host CPUs as OpenCL devices (cpu & cpu-minimal)." ON)
 
 option(ENABLE_HOST_CPU_DEVICES_OPENMP "Enables OpenMP support for Host CPU devices (cpu driver only, cpu-minimal driver remains single-threaded)" OFF)
@@ -716,6 +718,18 @@ if(ENABLE_TBB_DEVICE)
   message(STATUS "Found TBB library: ${TBB_LIBRARIES} with include dirs: ${TBB_INCLUDE_DIRS}" )
 
   # The tbb device depends on the pthread device which depends on the basic device. ENABLE_HOST_CPU_DEVICES enables both.
+  set(ENABLE_HOST_CPU_DEVICES 1)
+endif()
+
+if(ENABLE_SPERT_DEVICE)
+  set(SPERT_INCLUDE_DIR "" CACHE PATH "Path to the spine-runtime (spert) include directory")
+  set(SPERT_LIBRARY "" CACHE FILEPATH "Path to the spine-runtime (spert) library (libspert.so)")
+  if((NOT SPERT_INCLUDE_DIR) OR (NOT SPERT_LIBRARY))
+    message(FATAL_ERROR "ENABLE_SPERT_DEVICE requires -DSPERT_INCLUDE_DIR=... and -DSPERT_LIBRARY=...")
+  endif()
+  message(STATUS "Found spert library: ${SPERT_LIBRARY} with include dir: ${SPERT_INCLUDE_DIR}" )
+
+  # The spert device depends on the pthread device which depends on the basic device. ENABLE_HOST_CPU_DEVICES enables both.
   set(ENABLE_HOST_CPU_DEVICES 1)
 endif()
 
@@ -1925,7 +1939,7 @@ if(HOST_DEVICE_EXTENSIONS MATCHES "cl_khr_kernel_clock")
   )
 endif()
 
-set(HOST_DEVICE_SPV_EXTENSIONS "+SPV_KHR_no_integer_wrap_decoration,+SPV_KHR_linkonce_odr,+SPV_KHR_expect_assume,+SPV_INTEL_fp_fast_math_mode,+SPV_INTEL_unstructured_loop_controls,+SPV_INTEL_arbitrary_precision_integers,+SPV_INTEL_memory_access_aliasing,+SPV_INTEL_inline_assembly,+SPV_KHR_integer_dot_product")
+set(HOST_DEVICE_SPV_EXTENSIONS "+SPV_KHR_no_integer_wrap_decoration,+SPV_KHR_linkonce_odr,+SPV_KHR_expect_assume,+SPV_INTEL_fp_fast_math_mode,+SPV_INTEL_unstructured_loop_controls,+SPV_INTEL_arbitrary_precision_integers,+SPV_INTEL_memory_access_aliasing,+SPV_INTEL_inline_assembly,+SPV_KHR_integer_dot_product,+SPV_KHR_untyped_pointers")
 if(HOST_DEVICE_EXTENSIONS MATCHES "cl_ext_float_atomics")
   set(HOST_DEVICE_FEATURES "${HOST_DEVICE_FEATURES} __opencl_c_ext_fp32_global_atomic_add __opencl_c_ext_fp32_local_atomic_add __opencl_c_ext_fp32_global_atomic_min_max __opencl_c_ext_fp32_local_atomic_min_max")
   set(HOST_DEVICE_SPV_EXTENSIONS "${HOST_DEVICE_SPV_EXTENSIONS},+SPV_EXT_shader_atomic_float_add,+SPV_EXT_shader_atomic_float_min_max")
@@ -2036,6 +2050,11 @@ endif()
 if(ENABLE_TBB_DEVICE)
   set(BUILD_TBB 1)
   set(OCL_DRIVERS "${OCL_DRIVERS} tbb")
+endif()
+
+if(ENABLE_SPERT_DEVICE)
+  set(BUILD_SPERT 1)
+  set(OCL_DRIVERS "${OCL_DRIVERS} spert")
 endif()
 
 # The almaif device could be built by default, but it's implemented in C++,
